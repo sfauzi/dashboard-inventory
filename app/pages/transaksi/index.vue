@@ -137,13 +137,14 @@ definePageMeta({ middleware: "auth" });
 
 const { barangList, fetchBarang } = useBarang();
 const { transaksiList, fetchTransaksi, createTransaksi } = useTransaksi();
+const { showToast } = useToast();
 const showFormModal = ref(false);
 const filterTipe = ref("");
 const filterBarang = ref("");
 const refreshing = ref(false);
 const lastUpdateTime = ref(new Date().toLocaleTimeString());
 
-// Fungsi untuk refresh data
+// Fungsi refresh data
 const refreshData = async () => {
   refreshing.value = true;
   await Promise.all([fetchBarang(), fetchTransaksi()]);
@@ -151,18 +152,14 @@ const refreshData = async () => {
   refreshing.value = false;
 };
 
+// Auto refresh setiap 3 detik
+useInterval(refreshData, 3000);
+
 // Manual refresh
 const manualRefresh = async () => {
   await refreshData();
+  showToast("Data transaksi berhasil direfresh", "success", 2000);
 };
-
-// Auto refresh setiap 3 detik dengan useInterval
-const autoRefresh = () => {
-  refreshData();
-};
-
-// Setup interval 3 detik
-useInterval(autoRefresh, 3000);
 
 const filteredTransaksi = computed(() => {
   let result = transaksiList.value;
@@ -184,20 +181,26 @@ const formatDate = (date) => {
 };
 
 const handleSave = async (data) => {
+  const selectedBarang = barangList.value.find((b) => b.id === data.id_barang);
+  const typeText = data.tipe_transaksi === "masuk" ? "masuk" : "keluar";
+
   const result = await createTransaksi(data);
 
   if (result.success) {
     showFormModal.value = false;
-    alert("Transaksi berhasil dicatat");
-    // Immediate refresh after create
     await refreshData();
+
+    showToast(
+      `✅ Transaksi ${typeText} ${data.jumlah} unit "${selectedBarang?.nama}" berhasil dicatat`,
+      "success",
+      3000
+    );
   } else {
-    alert(result.error);
+    showToast(`❌ Gagal mencatat transaksi: ${result.error}`, "error", 4000);
   }
 };
 
 onMounted(async () => {
-  // Initial fetch
   await refreshData();
 });
 </script>

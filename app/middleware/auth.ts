@@ -14,9 +14,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     // Cek dari localStorage
     const isAuth = localStorage.getItem('is_authenticated')
     const userRole = localStorage.getItem('dashboard_role')
+    const { showToast } = useToast()
 
     // Jika belum login dan mencoba akses halaman terproteksi
     if (!isAuth && !isPublicPage) {
+      // showToast('⚠️ Anda harus login terlebih dahulu untuk mengakses halaman ini', 'warning', 4000)
       return navigateTo('/login')
     }
 
@@ -26,12 +28,17 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
 
     // Jika sudah login, cek role untuk akses halaman users
-    if (isAuth && to.path.startsWith('/users') && userRole !== 'admin') {
-      return navigateTo('/dashboard')
+    if (isAuth && to.path.startsWith('/users')) {
+      if (userRole !== 'admin') {
+        showToast('🔒 Akses ditolak! Halaman ini hanya untuk admin.', 'error', 4000)
+        return navigateTo('/dashboard')
+      }
     }
   } catch (error) {
     console.error('Auth middleware error:', error)
+    const { showToast } = useToast()
     if (!isPublicPage) {
+      showToast('❌ Terjadi kesalahan autentikasi', 'error', 4000)
       return navigateTo('/login')
     }
   }

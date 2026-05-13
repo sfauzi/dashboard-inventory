@@ -11,11 +11,14 @@
     <div v-else>
       <slot />
     </div>
+
+    <ToastContainer />
   </ClientOnly>
 </template>
 
 <script setup>
 import Sidebar from "~/components/Layout/Sidebar.vue";
+import ToastContainer from "~/components/ToastContainer.vue";
 
 const { isAuthenticated, checkUser } = useAuth();
 const { setupRealtime: setupBarangRealtime } = useBarang();
