@@ -14,31 +14,9 @@
       </button>
     </div>
 
-    <!-- Real-time Status Indicator -->
-    <!-- <div class="mb-4 flex items-center gap-4 flex-wrap">
-      <div class="flex items-center gap-2">
-        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-        <span class="text-xs text-gray-500">Auto Refresh (3 detik)</span>
-      </div>
-      <div class="text-xs text-gray-400">
-        Last update: {{ lastUpdateTime }}
-      </div>
-      <div class="text-xs text-gray-400">
-        Total data: {{ transaksiList.length }} transaksi
-      </div>
-      <button
-        @click="manualRefresh"
-        :disabled="refreshing"
-        class="text-xs text-blue-600 hover:text-blue-800 transition"
-      >
-        <Icon :name="refreshing ? 'mdi:loading' : 'mdi:refresh'" class="inline mr-1" />
-        {{ refreshing ? 'Refreshing...' : 'Refresh Now' }}
-      </button>
-    </div> -->
-
     <!-- Filter -->
     <div class="mb-6 flex gap-4 flex-wrap">
-      <select v-model="filterTipe" class="px-3 py-2 border border-gray-300 rounded-lg">
+      <select v-model="filterTipe" class="px-3 py-2 border border-gray-300 rounded-lg" @change="currentPage = 1">
         <option value="">Semua Transaksi</option>
         <option value="masuk">Barang Masuk</option>
         <option value="keluar">Barang Keluar</option>
@@ -47,6 +25,7 @@
       <select
         v-model="filterBarang"
         class="px-3 py-2 border border-gray-300 rounded-lg flex-1 min-w-[200px]"
+        @change="currentPage = 1"
       >
         <option value="">Semua Barang</option>
         <option v-for="barang in barangList" :key="barang.id" :value="barang.id">
@@ -61,23 +40,77 @@
         <table class="w-full">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Tanggal
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('tanggal')"
+              >
+                <div class="flex items-center gap-1">
+                  Tanggal
+                  <span class="inline-flex flex-col leading-none text-gray-400">
+                    <Icon name="mdi:menu-up" class="w-3 h-3 -mb-1" :class="sortField === 'tanggal' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-300'" />
+                    <Icon name="mdi:menu-down" class="w-3 h-3" :class="sortField === 'tanggal' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-300'" />
+                  </span>
+                </div>
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Kode Barang
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('barang_kode')"
+              >
+                <div class="flex items-center gap-1">
+                  Kode Barang
+                  <span class="inline-flex flex-col leading-none text-gray-400">
+                    <Icon name="mdi:menu-up" class="w-3 h-3 -mb-1" :class="sortField === 'barang_kode' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-300'" />
+                    <Icon name="mdi:menu-down" class="w-3 h-3" :class="sortField === 'barang_kode' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-300'" />
+                  </span>
+                </div>
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Nama Barang
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('barang_nama')"
+              >
+                <div class="flex items-center gap-1">
+                  Nama Barang
+                  <span class="inline-flex flex-col leading-none text-gray-400">
+                    <Icon name="mdi:menu-up" class="w-3 h-3 -mb-1" :class="sortField === 'barang_nama' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-300'" />
+                    <Icon name="mdi:menu-down" class="w-3 h-3" :class="sortField === 'barang_nama' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-300'" />
+                  </span>
+                </div>
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Tipe
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('tipe_transaksi')"
+              >
+                <div class="flex items-center gap-1">
+                  Tipe
+                  <span class="inline-flex flex-col leading-none text-gray-400">
+                    <Icon name="mdi:menu-up" class="w-3 h-3 -mb-1" :class="sortField === 'tipe_transaksi' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-300'" />
+                    <Icon name="mdi:menu-down" class="w-3 h-3" :class="sortField === 'tipe_transaksi' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-300'" />
+                  </span>
+                </div>
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Jumlah
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('jumlah')"
+              >
+                <div class="flex items-center gap-1">
+                  Jumlah
+                  <span class="inline-flex flex-col leading-none text-gray-400">
+                    <Icon name="mdi:menu-up" class="w-3 h-3 -mb-1" :class="sortField === 'jumlah' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-300'" />
+                    <Icon name="mdi:menu-down" class="w-3 h-3" :class="sortField === 'jumlah' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-300'" />
+                  </span>
+                </div>
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                User
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('user_nama')"
+              >
+                <div class="flex items-center gap-1">
+                  User
+                  <span class="inline-flex flex-col leading-none text-gray-400">
+                    <Icon name="mdi:menu-up" class="w-3 h-3 -mb-1" :class="sortField === 'user_nama' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-300'" />
+                    <Icon name="mdi:menu-down" class="w-3 h-3" :class="sortField === 'user_nama' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-300'" />
+                  </span>
+                </div>
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Aksi
@@ -86,7 +119,7 @@
           </thead>
           <tbody class="divide-y divide-gray-200">
             <tr
-              v-for="transaksi in filteredTransaksi"
+              v-for="transaksi in paginatedTransaksi"
               :key="transaksi.id"
               class="hover:bg-gray-50 transition"
             >
@@ -134,7 +167,7 @@
                 </div>
               </td>
             </tr>
-            <tr v-if="filteredTransaksi.length === 0">
+            <tr v-if="paginatedTransaksi.length === 0">
               <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                 <Icon name="mdi:database" class="w-12 h-12 mx-auto mb-2 text-gray-400" />
                 Belum ada transaksi
@@ -142,6 +175,69 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between flex-wrap gap-3">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span>Tampilkan</span>
+          <select
+            v-model="pageSize"
+            class="border border-gray-300 rounded px-2 py-1"
+            @change="currentPage = 1"
+          >
+            <option :value="5">5</option>
+            <option :value="10">10</option>
+            <option :value="25">25</option>
+            <option :value="50">50</option>
+          </select>
+          <span>dari {{ filteredTransaksi.length }} transaksi</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button
+            @click="currentPage = 1"
+            :disabled="currentPage === 1"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Icon name="mdi:chevron-double-left" />
+          </button>
+          <button
+            @click="currentPage--"
+            :disabled="currentPage === 1"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Icon name="mdi:chevron-left" />
+          </button>
+          <span v-for="page in visiblePages" :key="page">
+            <button
+              v-if="page !== '...'"
+              @click="currentPage = page"
+              :class="
+                currentPage === page
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'hover:bg-gray-50 border-gray-300'
+              "
+              class="px-3 py-1 rounded border text-sm"
+            >
+              {{ page }}
+            </button>
+            <span v-else class="px-2 py-1 text-sm text-gray-400">...</span>
+          </span>
+          <button
+            @click="currentPage++"
+            :disabled="currentPage === totalPages"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Icon name="mdi:chevron-right" />
+          </button>
+          <button
+            @click="currentPage = totalPages"
+            :disabled="currentPage === totalPages"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Icon name="mdi:chevron-double-right" />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -237,7 +333,25 @@ const refreshing = ref(false);
 const loading = ref(false);
 const lastUpdateTime = ref(new Date().toLocaleTimeString());
 
-// Fungsi refresh data
+// ── Sorting ──────────────────────────────────────────────
+const sortField = ref("tanggal");
+const sortOrder = ref("desc");
+
+const setSort = (field) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
+  } else {
+    sortField.value = field;
+    sortOrder.value = "asc";
+  }
+  currentPage.value = 1;
+};
+
+// ── Pagination ───────────────────────────────────────────
+const currentPage = ref(1);
+const pageSize = ref(5);
+
+// ── Refresh ──────────────────────────────────────────────
 const refreshData = async () => {
   refreshing.value = true;
   await Promise.all([fetchBarang(), fetchTransaksi()]);
@@ -245,7 +359,6 @@ const refreshData = async () => {
   refreshing.value = false;
 };
 
-// Auto refresh setiap 3 detik
 useInterval(refreshData, 3000);
 
 const manualRefresh = async () => {
@@ -253,23 +366,100 @@ const manualRefresh = async () => {
   showToast("Data transaksi berhasil direfresh", "success", 2000);
 };
 
+// ── Computed ─────────────────────────────────────────────
 const filteredTransaksi = computed(() => {
   let result = transaksiList.value;
+
   if (filterTipe.value) {
     result = result.filter((t) => t.tipe_transaksi === filterTipe.value);
   }
   if (filterBarang.value) {
     result = result.filter((t) => t.id_barang === filterBarang.value);
   }
+
+  // Sorting
+  result = [...result].sort((a, b) => {
+    let valA, valB;
+
+    if (sortField.value === "tanggal") {
+      valA = new Date(a.tanggal).getTime();
+      valB = new Date(b.tanggal).getTime();
+    } else if (sortField.value === "jumlah") {
+      valA = a.jumlah;
+      valB = b.jumlah;
+    } else if (sortField.value === "barang_kode") {
+      valA = a.barang?.kode ?? "";
+      valB = b.barang?.kode ?? "";
+    } else if (sortField.value === "barang_nama") {
+      valA = a.barang?.nama ?? "";
+      valB = b.barang?.nama ?? "";
+    } else if (sortField.value === "tipe_transaksi") {
+      valA = a.tipe_transaksi ?? "";
+      valB = b.tipe_transaksi ?? "";
+    } else if (sortField.value === "user_nama") {
+      valA = a.users?.name ?? "";
+      valB = b.users?.name ?? "";
+    } else {
+      valA = a[sortField.value] ?? "";
+      valB = b[sortField.value] ?? "";
+    }
+
+    if (typeof valA === "number" && typeof valB === "number") {
+      return sortOrder.value === "asc" ? valA - valB : valB - valA;
+    }
+    return sortOrder.value === "asc"
+      ? String(valA).localeCompare(String(valB))
+      : String(valB).localeCompare(String(valA));
+  });
+
   return result;
 });
 
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(filteredTransaksi.value.length / pageSize.value))
+);
+
+const paginatedTransaksi = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  return filteredTransaksi.value.slice(start, start + pageSize.value);
+});
+
+const visiblePages = computed(() => {
+  const total = totalPages.value;
+  const current = currentPage.value;
+  const pages = [];
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push("...");
+    for (
+      let i = Math.max(2, current - 1);
+      i <= Math.min(total - 1, current + 1);
+      i++
+    ) {
+      pages.push(i);
+    }
+    if (current < total - 2) pages.push("...");
+    pages.push(total);
+  }
+
+  return pages;
+});
+
+// Reset ke halaman 1 saat filter berubah
+watch([filterTipe, filterBarang], () => {
+  currentPage.value = 1;
+});
+
+// ── Helpers ──────────────────────────────────────────────
 const formatDate = (date) => {
   if (!date) return "-";
   return new Date(date).toLocaleString("id-ID");
 };
 
-// CREATE
+// ── CREATE ───────────────────────────────────────────────
 const openCreateModal = () => {
   showCreateModal.value = true;
 };
@@ -293,7 +483,7 @@ const handleCreate = async (data) => {
   }
 };
 
-// EDIT
+// ── EDIT ─────────────────────────────────────────────────
 const openEditModal = (transaksi) => {
   selectedTransaksi.value = transaksi;
   showEditModal.value = true;
@@ -321,7 +511,7 @@ const handleUpdate = async (id, jumlahBaru, catatan) => {
   }
 };
 
-// DELETE
+// ── DELETE ───────────────────────────────────────────────
 const openDeleteModal = (transaksi) => {
   selectedTransaksi.value = transaksi;
   showDeleteModal.value = true;
@@ -348,6 +538,7 @@ const confirmDelete = async () => {
   loading.value = false;
 };
 
+// ── LIFECYCLE ────────────────────────────────────────────
 onMounted(async () => {
   await refreshData();
 });

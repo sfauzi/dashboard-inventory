@@ -34,45 +34,67 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dibuat Pada</th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('name')"
+              >
+                <div class="flex items-center gap-1">
+                  Nama <SortIcon field="name" :sort-field="sortField" :sort-order="sortOrder" />
+                </div>
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('username')"
+              >
+                <div class="flex items-center gap-1">
+                  Username <SortIcon field="username" :sort-field="sortField" :sort-order="sortOrder" />
+                </div>
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('role')"
+              >
+                <div class="flex items-center gap-1">
+                  Role <SortIcon field="role" :sort-field="sortField" :sort-order="sortOrder" />
+                </div>
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('created_at')"
+              >
+                <div class="flex items-center gap-1">
+                  Dibuat Pada <SortIcon field="created_at" :sort-field="sortField" :sort-order="sortOrder" />
+                </div>
+              </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr v-for="(userItem, index) in filteredUsers" :key="userItem.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 text-sm text-gray-500">{{ index + 1 }}</td>
+            <tr v-for="(userItem, index) in paginatedUsers" :key="userItem.id" class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm text-gray-500">{{ (currentPage - 1) * pageSize + index + 1 }}</td>
               <td class="px-6 py-4 font-medium text-gray-800">{{ userItem.name }}</td>
               <td class="px-6 py-4 text-sm text-gray-600">{{ userItem.username }}</td>
               <td class="px-6 py-4">
-                <span :class="userItem.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'"
-                      class="px-2 py-1 rounded-full text-xs font-medium">
+                <span
+                  :class="userItem.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'"
+                  class="px-2 py-1 rounded-full text-xs font-medium"
+                >
                   {{ userItem.role === 'admin' ? 'Admin' : 'Operator' }}
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">{{ formatDate(userItem.created_at) }}</td>
               <td class="px-6 py-4">
                 <div class="flex gap-2">
-                  <button 
-                    @click="openEditModal(userItem)" 
-                    class="text-blue-600 hover:text-blue-800 transition"
-                    title="Edit User"
-                  >
+                  <button @click="openEditModal(userItem)" class="text-blue-600 hover:text-blue-800 transition" title="Edit User">
                     <Icon name="mdi:pencil" class="w-5 h-5" />
                   </button>
-                  <button 
-                    @click="openDeleteModal(userItem)" 
-                    class="text-red-600 hover:text-red-800 transition"
-                    title="Hapus User"
-                  >
+                  <button @click="openDeleteModal(userItem)" class="text-red-600 hover:text-red-800 transition" title="Hapus User">
                     <Icon name="mdi:delete" class="w-5 h-5" />
                   </button>
                 </div>
               </td>
             </tr>
-            <tr v-if="filteredUsers.length === 0">
+            <tr v-if="paginatedUsers.length === 0">
               <td colspan="6" class="px-6 py-8 text-center text-gray-500">
                 <Icon name="mdi:account-off" class="w-12 h-12 mx-auto mb-2 text-gray-400" />
                 Tidak ada data user
@@ -80,6 +102,45 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between flex-wrap gap-3">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span>Tampilkan</span>
+          <select v-model="pageSize" class="border border-gray-300 rounded px-2 py-1" @change="currentPage = 1">
+            <option :value="5">5</option>
+            <option :value="10">10</option>
+            <option :value="25">25</option>
+          </select>
+          <span>dari {{ filteredUsers.length }} data</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button @click="currentPage = 1" :disabled="currentPage === 1"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
+            <Icon name="mdi:chevron-double-left" />
+          </button>
+          <button @click="currentPage--" :disabled="currentPage === 1"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
+            <Icon name="mdi:chevron-left" />
+          </button>
+          <span v-for="page in visiblePages" :key="page">
+            <button v-if="page !== '...'" @click="currentPage = page"
+              :class="currentPage === page ? 'bg-blue-600 text-white border-blue-600' : 'hover:bg-gray-50 border-gray-300'"
+              class="px-3 py-1 rounded border text-sm">
+              {{ page }}
+            </button>
+            <span v-else class="px-2 py-1 text-sm text-gray-400">...</span>
+          </span>
+          <button @click="currentPage++" :disabled="currentPage === totalPages"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
+            <Icon name="mdi:chevron-right" />
+          </button>
+          <button @click="currentPage = totalPages" :disabled="currentPage === totalPages"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
+            <Icon name="mdi:chevron-double-right" />
+          </button>
+        </div>
       </div>
     </div>
     
@@ -230,6 +291,8 @@
 </template>
 
 <script setup>
+import SortIcon from '~/components/SortIcon.vue'
+
 definePageMeta({ middleware: 'auth' })
 
 const supabase = useSupabaseClient()
@@ -254,14 +317,72 @@ const userForm = reactive({
 
 // Filter users berdasarkan search
 const filteredUsers = computed(() => {
-  if (!searchQuery.value) return userList.value
-  
-  const query = searchQuery.value.toLowerCase()
-  return userList.value.filter(user => 
-    user.name.toLowerCase().includes(query) || 
-    user.username.toLowerCase().includes(query)
-  )
+  let result = userList.value
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    result = result.filter(
+      user => user.name.toLowerCase().includes(query) || user.username.toLowerCase().includes(query)
+    )
+  }
+
+  // Sorting
+  result = [...result].sort((a, b) => {
+    const valA = a[sortField.value] ?? ''
+    const valB = b[sortField.value] ?? ''
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      return sortOrder.value === 'asc' ? valA - valB : valB - valA
+    }
+    return sortOrder.value === 'asc'
+      ? String(valA).localeCompare(String(valB))
+      : String(valB).localeCompare(String(valA))
+  })
+
+  return result
 })
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredUsers.value.length / pageSize.value)))
+
+const paginatedUsers = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return filteredUsers.value.slice(start, start + pageSize.value)
+})
+
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+  const pages = []
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i)
+  } else {
+    pages.push(1)
+    if (current > 3) pages.push('...')
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i)
+    if (current < total - 2) pages.push('...')
+    pages.push(total)
+  }
+  return pages
+})
+
+watch(searchQuery, () => { currentPage.value = 1 })
+
+// Sorting
+const sortField = ref('name')
+const sortOrder = ref('asc')
+
+const setSort = (field) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortOrder.value = 'asc'
+  }
+  currentPage.value = 1
+}
+
+// Pagination
+const currentPage = ref(1)
+const pageSize = ref(5)
 
 const formatDate = (date) => {
   if (!date) return '-'
