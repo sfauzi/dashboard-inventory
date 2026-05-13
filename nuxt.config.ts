@@ -7,13 +7,20 @@ export default defineNuxtConfig({
     // preset: "static"
     preset: 'node-server'
   },
+  runtimeConfig: {
+    public: {
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseKey: process.env.SUPABASE_KEY,
+    },
+  },
   css: ['~/assets/css/main.css'],
   modules: [
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxt/image',
     '@nuxtjs/google-fonts',
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/supabase',
   ],
   googleFonts: {
     families: {
