@@ -14,39 +14,19 @@
       </button>
     </div>
 
-    <!-- Real-time Status Indicator -->
-    <!-- <div class="mb-4 flex items-center gap-4 flex-wrap">
-      <div class="flex items-center gap-2">
-        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-        <span class="text-xs text-gray-500">Auto Refresh (3 detik)</span>
-      </div>
-      <div class="text-xs text-gray-400">Last update: {{ lastUpdateTime }}</div>
-      <div class="text-xs text-gray-400">Total data: {{ barangList.length }} barang</div>
-      <button
-        @click="manualRefresh"
-        :disabled="refreshing"
-        class="text-xs text-blue-600 hover:text-blue-800 transition"
-      >
-        <Icon :name="refreshing ? 'mdi:loading' : 'mdi:refresh'" class="inline mr-1" />
-        {{ refreshing ? "Refreshing..." : "Refresh Now" }}
-      </button>
-    </div> -->
-
     <!-- Search and Filter -->
     <div class="mb-6 flex gap-4">
       <div class="flex-1 relative">
-        <Icon
-          name="mdi:magnify"
-          class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-        />
+        <Icon name="mdi:magnify" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Cari barang..."
           class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg"
+          @input="currentPage = 1"
         />
       </div>
-      <select v-model="filterStock" class="px-3 py-2 border border-gray-300 rounded-lg">
+      <select v-model="filterStock" class="px-3 py-2 border border-gray-300 rounded-lg" @change="currentPage = 1">
         <option value="">Semua Stok</option>
         <option value="low">Stok Menipis (&lt;10)</option>
         <option value="normal">Stok Normal</option>
@@ -59,17 +39,41 @@
         <table class="w-full">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Kode
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('kode')"
+              >
+                <div class="flex items-center gap-1">
+                  Kode
+                  <SortIcon field="kode" :sort-field="sortField" :sort-order="sortOrder" />
+                </div>
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Nama Barang
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('nama')"
+              >
+                <div class="flex items-center gap-1">
+                  Nama Barang
+                  <SortIcon field="nama" :sort-field="sortField" :sort-order="sortOrder" />
+                </div>
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Stok
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('stok')"
+              >
+                <div class="flex items-center gap-1">
+                  Stok
+                  <SortIcon field="stok" :sort-field="sortField" :sort-order="sortOrder" />
+                </div>
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Lokasi Rak
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setSort('lokasi_rak')"
+              >
+                <div class="flex items-center gap-1">
+                  Lokasi Rak
+                  <SortIcon field="lokasi_rak" :sort-field="sortField" :sort-order="sortOrder" />
+                </div>
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Status
@@ -81,22 +85,18 @@
           </thead>
           <tbody class="divide-y divide-gray-200">
             <tr
-              v-for="barang in filteredBarang"
+              v-for="barang in paginatedBarang"
               :key="barang.id"
               class="hover:bg-gray-50"
             >
               <td class="px-6 py-4 text-sm font-mono text-gray-600">{{ barang.kode }}</td>
               <td class="px-6 py-4 font-medium text-gray-800">{{ barang.nama }}</td>
               <td class="px-6 py-4">
-                <span
-                  :class="barang.stok < 10 ? 'text-red-600 font-bold' : 'text-gray-600'"
-                >
+                <span :class="barang.stok < 10 ? 'text-red-600 font-bold' : 'text-gray-600'">
                   {{ barang.stok }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-600">
-                {{ barang.lokasi_rak || "-" }}
-              </td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ barang.lokasi_rak || "-" }}</td>
               <td class="px-6 py-4">
                 <span
                   v-if="barang.stok < 10"
@@ -104,32 +104,86 @@
                 >
                   Stok Menipis
                 </span>
-                <span
-                  v-else
-                  class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium"
-                >
+                <span v-else class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
                   Normal
                 </span>
               </td>
               <td class="px-6 py-4">
                 <div class="flex gap-2">
-                  <button
-                    @click="openForm(barang)"
-                    class="text-blue-600 hover:text-blue-800"
-                  >
+                  <button @click="openForm(barang)" class="text-blue-600 hover:text-blue-800">
                     <Icon name="mdi:pencil" />
                   </button>
-                  <button
-                    @click="confirmDelete(barang)"
-                    class="text-red-600 hover:text-red-800"
-                  >
+                  <button @click="confirmDelete(barang)" class="text-red-600 hover:text-red-800">
                     <Icon name="mdi:delete" />
                   </button>
                 </div>
               </td>
             </tr>
+            <tr v-if="paginatedBarang.length === 0">
+              <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                Tidak ada data barang
+              </td>
+            </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between flex-wrap gap-3">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span>Tampilkan</span>
+          <select v-model="pageSize" class="border border-gray-300 rounded px-2 py-1" @change="currentPage = 1">
+            <option :value="5">5</option>
+            <option :value="10">10</option>
+            <option :value="25">25</option>
+            <option :value="50">50</option>
+          </select>
+          <span>dari {{ filteredBarang.length }} data</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button
+            @click="currentPage = 1"
+            :disabled="currentPage === 1"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Icon name="mdi:chevron-double-left" />
+          </button>
+          <button
+            @click="currentPage--"
+            :disabled="currentPage === 1"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Icon name="mdi:chevron-left" />
+          </button>
+          <span
+            v-for="page in visiblePages"
+            :key="page"
+          >
+            <button
+              v-if="page !== '...'"
+              @click="currentPage = page"
+              :class="currentPage === page ? 'bg-blue-600 text-white border-blue-600' : 'hover:bg-gray-50 border-gray-300'"
+              class="px-3 py-1 rounded border text-sm"
+            >
+              {{ page }}
+            </button>
+            <span v-else class="px-2 py-1 text-sm text-gray-400">...</span>
+          </span>
+          <button
+            @click="currentPage++"
+            :disabled="currentPage === totalPages"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Icon name="mdi:chevron-right" />
+          </button>
+          <button
+            @click="currentPage = totalPages"
+            :disabled="currentPage === totalPages"
+            class="px-2 py-1 rounded border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Icon name="mdi:chevron-double-right" />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -161,6 +215,24 @@ const searchQuery = ref("");
 const filterStock = ref("");
 const lastUpdateTime = ref(new Date().toLocaleTimeString());
 const refreshing = ref(false);
+
+// Sorting
+const sortField = ref("nama");
+const sortOrder = ref("asc"); // 'asc' | 'desc'
+
+const setSort = (field) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
+  } else {
+    sortField.value = field;
+    sortOrder.value = "asc";
+  }
+  currentPage.value = 1;
+};
+
+// Pagination
+const currentPage = ref(1);
+const pageSize = ref(5);
 
 // Fungsi refresh data
 const refreshData = async () => {
@@ -195,8 +267,48 @@ const filteredBarang = computed(() => {
     result = result.filter((b) => b.stok >= 10);
   }
 
+  // Sorting
+  result = [...result].sort((a, b) => {
+    const valA = a[sortField.value] ?? "";
+    const valB = b[sortField.value] ?? "";
+    if (typeof valA === "number" && typeof valB === "number") {
+      return sortOrder.value === "asc" ? valA - valB : valB - valA;
+    }
+    return sortOrder.value === "asc"
+      ? String(valA).localeCompare(String(valB))
+      : String(valB).localeCompare(String(valA));
+  });
+
   return result;
 });
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredBarang.value.length / pageSize.value)));
+
+const paginatedBarang = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  return filteredBarang.value.slice(start, start + pageSize.value);
+});
+
+const visiblePages = computed(() => {
+  const total = totalPages.value;
+  const current = currentPage.value;
+  const pages = [];
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push("...");
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+      pages.push(i);
+    }
+    if (current < total - 2) pages.push("...");
+    pages.push(total);
+  }
+  return pages;
+});
+
+// Reset page saat filter berubah
+watch([searchQuery, filterStock], () => { currentPage.value = 1; });
 
 const openForm = (barang = null) => {
   selectedBarang.value = barang;
@@ -222,7 +334,6 @@ const handleSave = async (data) => {
   if (result.success) {
     closeForm();
     await refreshData();
-
     if (isEdit) {
       showToast(`Barang "${data.nama}" berhasil diupdate`, "success", 3000);
     } else {
