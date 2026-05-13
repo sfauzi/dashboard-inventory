@@ -15,6 +15,7 @@
             type="text"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="Contoh: BRG-001"
           />
         </div>
 
@@ -27,6 +28,7 @@
             type="text"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="Masukkan nama barang"
           />
         </div>
 
@@ -37,6 +39,7 @@
             type="number"
             min="0"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="0"
           />
         </div>
 
@@ -59,7 +62,7 @@
           </button>
           <button
             type="button"
-            @click="emit('close')"
+            @click="$emit('close')"
             class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition"
           >
             Batal
@@ -80,6 +83,7 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "save"]);
 
+// Initialize form data
 const form = reactive({
   id: props.barang?.id || null,
   kode: props.barang?.kode || "",
@@ -89,6 +93,18 @@ const form = reactive({
 });
 
 const save = () => {
+  // Validasi form
+  if (!form.kode || !form.kode.trim()) {
+    alert("Kode barang harus diisi");
+    return;
+  }
+
+  if (!form.nama || !form.nama.trim()) {
+    alert("Nama barang harus diisi");
+    return;
+  }
+
+  // Kirim data ke parent
   emit("save", { ...form });
 };
 </script>

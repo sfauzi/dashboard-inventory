@@ -165,17 +165,21 @@ const closeForm = () => {
 
 const handleSave = async (data) => {
   let result;
+
   if (data.id) {
+    // Update existing barang
     result = await updateBarang(data.id, data);
   } else {
-    result = await createBarang(data);
+    // Create new barang - Hapus id jika ada
+    const { id, ...newBarang } = data;
+    result = await createBarang(newBarang);
   }
 
   if (result.success) {
     closeForm();
-    // Show success notification
+    alert(data.id ? "Barang berhasil diupdate" : "Barang berhasil ditambahkan");
   } else {
-    alert(result.error);
+    alert(result.error || "Gagal menyimpan barang");
   }
 };
 
