@@ -22,6 +22,13 @@ export default defineNuxtConfig({
       exclude: ['/*'],
     },
   },
+  routeRules: {
+    '/login': { ssr: false },
+    '/dashboard': { ssr: false },
+    '/barang': { ssr: false },
+    '/transaksi': { ssr: false },
+    '/users': { ssr: false },
+  },
   css: ['~/assets/css/main.css'],
   modules: [
     '@nuxt/fonts',

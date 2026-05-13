@@ -1,18 +1,22 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <ClientOnly>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </ClientOnly>
 </template>
 
 <script setup>
 useHead({
-  title: "Dashboard Stok Barang",
-  meta: [{ name: "description", content: "Sistem Manajemen Inventaris Barang" }],
-});
+  title: 'Dashboard Stok Barang',
+  meta: [
+    { name: 'description', content: 'Sistem Manajemen Inventaris Barang' }
+  ]
+})
 
-const { checkUser } = useAuth();
+const { checkUser } = useAuth()
 
 onMounted(async () => {
-  await checkUser();
-});
+  await checkUser()
+})
 </script>

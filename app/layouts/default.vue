@@ -1,23 +1,25 @@
 <template>
-  <div v-if="isAuthenticated" class="flex h-screen bg-gray-50">
-    <Sidebar />
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto">
-        <slot />
+  <ClientOnly>
+    <div v-if="isAuthenticated" class="flex h-screen bg-gray-50">
+      <Sidebar />
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 overflow-y-auto">
+          <slot />
+        </div>
       </div>
     </div>
-  </div>
-  <div v-else>
-    <NuxtPage />
-  </div>
+    <div v-else>
+      <slot />
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>
-import Sidebar from '~/components/Layout/Sidebar.vue'
+import Sidebar from "~/components/Layout/Sidebar.vue";
 
-const { isAuthenticated, checkUser } = useAuth()
+const { isAuthenticated, checkUser } = useAuth();
 
 onMounted(async () => {
-  await checkUser()
-})
+  await checkUser();
+});
 </script>
