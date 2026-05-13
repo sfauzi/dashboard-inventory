@@ -1,44 +1,59 @@
-export default defineNuxtRouteMiddleware(async (to) => {
-  // Skip di server-side
-  if (process.server) {
-    return
-  }
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  if (process.server) return
 
-  // Halaman yang tidak memerlukan auth
   const publicPages = ['/login']
-
-  // Cek apakah halaman saat ini adalah public page
   const isPublicPage = publicPages.includes(to.path)
 
+  const setPendingToast = (message: string, type: string, duration: number) => {
+    sessionStorage.setItem('pending_toast', JSON.stringify({ message, type, duration }))
+  }
+
+  // Flag logout hanya untuk suppress toast, bukan skip auth check
+  const isLoggingOut = !!sessionStorage.getItem('is_logging_out')
+  if (isLoggingOut) {
+    sessionStorage.removeItem('is_logging_out')
+  }
+
   try {
-    // Cek dari localStorage
     const isAuth = localStorage.getItem('is_authenticated')
     const userRole = localStorage.getItem('dashboard_role')
-    const { showToast } = useToast()
 
-    // Jika belum login dan mencoba akses halaman terproteksi
     if (!isAuth && !isPublicPage) {
-      // showToast('Anda harus login terlebih dahulu untuk mengakses halaman ini', 'warning', 4000)
+      const appReady = sessionStorage.getItem('app_ready')
+      // Tampilkan toast hanya jika bukan logout DAN app sudah ready
+      if (appReady && !isLoggingOut) {
+        setPendingToast(
+          'Anda harus login terlebih dahulu untuk mengakses halaman ini',
+          'warning',
+          4000
+        )
+      }
       return navigateTo('/login')
     }
 
-    // Jika sudah login dan mencoba akses halaman login
     if (isAuth && isPublicPage) {
+      setPendingToast('Anda sudah login!', 'info', 4000)
       return navigateTo('/dashboard')
     }
 
-    // Jika sudah login, cek role untuk akses halaman users
     if (isAuth && to.path.startsWith('/users')) {
       if (userRole !== 'admin') {
-        showToast('Akses ditolak! Halaman ini hanya untuk admin.', 'error', 4000)
+        // Tampilkan toast hanya jika bukan proses logout
+        if (!isLoggingOut) {
+          setPendingToast(
+            'Akses ditolak! Halaman ini hanya untuk admin.',
+            'error',
+            4000
+          )
+        }
         return navigateTo('/dashboard')
       }
     }
+
   } catch (error) {
     console.error('Auth middleware error:', error)
-    const { showToast } = useToast()
     if (!isPublicPage) {
-      showToast('Terjadi kesalahan autentikasi', 'error', 4000)
+      setPendingToast('Terjadi kesalahan autentikasi', 'error', 4000)
       return navigateTo('/login')
     }
   }

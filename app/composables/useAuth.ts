@@ -197,6 +197,16 @@ export const useAuth = () => {
       user.value = null
       role.value = null
       isAuthenticated.value = false
+
+      // Tandai sedang logout agar middleware tidak tampilkan toast lain
+      sessionStorage.setItem('is_logging_out', '1')
+
+      sessionStorage.setItem('pending_toast', JSON.stringify({
+        message: 'Logout berhasil!',
+        type: 'success',
+        duration: 4000
+      }))
+
       navigateTo('/login')
     }
   }
