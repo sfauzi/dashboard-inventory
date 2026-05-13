@@ -2,3 +2,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Animasi untuk realtime indicator */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Animasi untuk row baru */
+@keyframes fadeIn {
+  from {
+    background-color: #eff6ff;
+    transform: translateX(-10px);
+  }
+  to {
+    background-color: transparent;
+    transform: translateX(0);
+  }
+}
+
+.bg-blue-50 {
+  animation: fadeIn 1s ease-out;
+}

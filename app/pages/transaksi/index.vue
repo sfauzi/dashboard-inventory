@@ -14,8 +14,28 @@
       </button>
     </div>
 
+    <!-- Real-time Status Indicator -->
+    <!-- <div class="mb-4 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        <span class="text-xs text-gray-500">Auto Refresh (3 detik)</span>
+      </div>
+      <div class="text-xs text-gray-400">Last update: {{ lastUpdateTime }}</div>
+      <div class="text-xs text-gray-400">
+        Total data: {{ transaksiList.length }} transaksi
+      </div>
+      <button
+        @click="manualRefresh"
+        :disabled="refreshing"
+        class="text-xs text-blue-600 hover:text-blue-800 transition"
+      >
+        <Icon :name="refreshing ? 'mdi:loading' : 'mdi:refresh'" class="inline mr-1" />
+        {{ refreshing ? "Refreshing..." : "Refresh Now" }}
+      </button>
+    </div> -->
+
     <!-- Filter -->
-    <div class="mb-6 flex gap-4">
+    <div class="mb-6 flex gap-4 flex-wrap">
       <select v-model="filterTipe" class="px-3 py-2 border border-gray-300 rounded-lg">
         <option value="">Semua Transaksi</option>
         <option value="masuk">Barang Masuk</option>
@@ -24,11 +44,11 @@
 
       <select
         v-model="filterBarang"
-        class="px-3 py-2 border border-gray-300 rounded-lg flex-1"
+        class="px-3 py-2 border border-gray-300 rounded-lg flex-1 min-w-[200px]"
       >
         <option value="">Semua Barang</option>
         <option v-for="barang in barangList" :key="barang.id" :value="barang.id">
-          {{ barang.nama }} ({{ barang.kode }})
+          {{ barang.nama }} ({{ barang.kode }}) - Stok: {{ barang.stok }}
         </option>
       </select>
     </div>
@@ -63,7 +83,7 @@
             <tr
               v-for="transaksi in filteredTransaksi"
               :key="transaksi.id"
-              class="hover:bg-gray-50"
+              class="hover:bg-gray-50 transition"
             >
               <td class="px-6 py-4 text-sm text-gray-600">
                 {{ formatDate(transaksi.tanggal) }}
@@ -91,6 +111,12 @@
                 {{ transaksi.users?.name || "-" }}
               </td>
             </tr>
+            <tr v-if="filteredTransaksi.length === 0">
+              <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                <Icon name="mdi:database" class="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                Belum ada transaksi
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -114,6 +140,29 @@ const { transaksiList, fetchTransaksi, createTransaksi } = useTransaksi();
 const showFormModal = ref(false);
 const filterTipe = ref("");
 const filterBarang = ref("");
+const refreshing = ref(false);
+const lastUpdateTime = ref(new Date().toLocaleTimeString());
+
+// Fungsi untuk refresh data
+const refreshData = async () => {
+  refreshing.value = true;
+  await Promise.all([fetchBarang(), fetchTransaksi()]);
+  lastUpdateTime.value = new Date().toLocaleTimeString();
+  refreshing.value = false;
+};
+
+// Manual refresh
+const manualRefresh = async () => {
+  await refreshData();
+};
+
+// Auto refresh setiap 3 detik dengan useInterval
+const autoRefresh = () => {
+  refreshData();
+};
+
+// Setup interval 3 detik
+useInterval(autoRefresh, 3000);
 
 const filteredTransaksi = computed(() => {
   let result = transaksiList.value;
@@ -130,6 +179,7 @@ const filteredTransaksi = computed(() => {
 });
 
 const formatDate = (date) => {
+  if (!date) return "-";
   return new Date(date).toLocaleString("id-ID");
 };
 
@@ -139,12 +189,15 @@ const handleSave = async (data) => {
   if (result.success) {
     showFormModal.value = false;
     alert("Transaksi berhasil dicatat");
+    // Immediate refresh after create
+    await refreshData();
   } else {
     alert(result.error);
   }
 };
 
 onMounted(async () => {
-  await Promise.all([fetchBarang(), fetchTransaksi()]);
+  // Initial fetch
+  await refreshData();
 });
 </script>
