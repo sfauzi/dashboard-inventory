@@ -12,6 +12,7 @@ export default {
             Manrope: "Manrope, sans-serif",
             Mansalva: "Mansalva, sans-serif",
             Rubik: "Rubik, sans-serif",
+            DM: "DM Sans, sans-serif",
         },
 
     },

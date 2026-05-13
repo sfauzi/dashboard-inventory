@@ -11,6 +11,15 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY,
+      socketUrl: process.env.SOCKET_URL || 'http://localhost:3000',
+    },
+  },
+  supabase: {
+    redirect: false,
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      exclude: ['/*'],
     },
   },
   css: ['~/assets/css/main.css'],
