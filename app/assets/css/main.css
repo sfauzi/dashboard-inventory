@@ -33,9 +33,9 @@
   }
 }
 
-.bg-blue-50 {
+/* .bg-blue-50 {
   animation: fadeIn 1s ease-out;
-}
+} */
 
 /* Toast animations */
 @keyframes slideInRight {

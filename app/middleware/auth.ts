@@ -18,7 +18,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
     // Jika belum login dan mencoba akses halaman terproteksi
     if (!isAuth && !isPublicPage) {
-      // showToast('⚠️ Anda harus login terlebih dahulu untuk mengakses halaman ini', 'warning', 4000)
+      // showToast('Anda harus login terlebih dahulu untuk mengakses halaman ini', 'warning', 4000)
       return navigateTo('/login')
     }
 
@@ -30,7 +30,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     // Jika sudah login, cek role untuk akses halaman users
     if (isAuth && to.path.startsWith('/users')) {
       if (userRole !== 'admin') {
-        showToast('🔒 Akses ditolak! Halaman ini hanya untuk admin.', 'error', 4000)
+        showToast('Akses ditolak! Halaman ini hanya untuk admin.', 'error', 4000)
         return navigateTo('/dashboard')
       }
     }
@@ -38,7 +38,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     console.error('Auth middleware error:', error)
     const { showToast } = useToast()
     if (!isPublicPage) {
-      showToast('❌ Terjadi kesalahan autentikasi', 'error', 4000)
+      showToast('Terjadi kesalahan autentikasi', 'error', 4000)
       return navigateTo('/login')
     }
   }

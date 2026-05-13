@@ -224,12 +224,12 @@ const handleSave = async (data) => {
     await refreshData();
 
     if (isEdit) {
-      showToast(`✅ Barang "${data.nama}" berhasil diupdate`, "success", 3000);
+      showToast(`Barang "${data.nama}" berhasil diupdate`, "success", 3000);
     } else {
-      showToast(`✅ Barang "${data.nama}" berhasil ditambahkan`, "success", 3000);
+      showToast(`Barang "${data.nama}" berhasil ditambahkan`, "success", 3000);
     }
   } else {
-    showToast(`❌ Gagal menyimpan barang: ${result.error}`, "error", 4000);
+    showToast(`Gagal menyimpan barang: ${result.error}`, "error", 4000);
   }
 };
 
@@ -238,9 +238,9 @@ const confirmDelete = async (barang) => {
     const result = await deleteBarang(barang.id);
     if (result.success) {
       await refreshData();
-      showToast(`🗑️ Barang "${barang.nama}" berhasil dihapus`, "warning", 3000);
+      showToast(`Barang "${barang.nama}" berhasil dihapus`, "warning", 3000);
     } else {
-      showToast(`❌ Gagal menghapus barang: ${result.error}`, "error", 4000);
+      showToast(`Gagal menghapus barang: ${result.error}`, "error", 4000);
     }
   }
 };
