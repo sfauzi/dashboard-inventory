@@ -290,7 +290,7 @@ const fetchUsers = async () => {
     console.log('Users fetched:', userList.value.length)
   } catch (error) {
     console.error('Error fetching users:', error)
-    showToast('❌ Gagal mengambil data users', 'error', 4000)
+    showToast('Gagal mengambil data users', 'error', 4000)
   }
 }
 
@@ -308,7 +308,7 @@ const openFormModal = () => {
 const openEditModal = (user) => {
   if (!user || !user.id) {
     console.error('Invalid user data for edit:', user)
-    showToast('❌ Data user tidak valid', 'error', 3000)
+    showToast('Data user tidak valid', 'error', 3000)
     return
   }
   
@@ -337,27 +337,27 @@ const closeFormModal = () => {
 const saveUser = async () => {
   // Validasi
   if (!userForm.name.trim()) {
-    showToast('⚠️ Nama lengkap harus diisi', 'warning', 3000)
+    showToast('Nama lengkap harus diisi', 'warning', 3000)
     return
   }
   
   if (!userForm.username.trim()) {
-    showToast('⚠️ Username harus diisi', 'warning', 3000)
+    showToast('Username harus diisi', 'warning', 3000)
     return
   }
   
   if (!isEditMode.value && !userForm.password.trim()) {
-    showToast('⚠️ Password harus diisi', 'warning', 3000)
+    showToast('Password harus diisi', 'warning', 3000)
     return
   }
   
   if (!isEditMode.value && userForm.password.length < 4) {
-    showToast('⚠️ Password minimal 4 karakter', 'warning', 3000)
+    showToast('Password minimal 4 karakter', 'warning', 3000)
     return
   }
   
   if (isEditMode.value && userForm.password && userForm.password.length < 4) {
-    showToast('⚠️ Password minimal 4 karakter', 'warning', 3000)
+    showToast('Password minimal 4 karakter', 'warning', 3000)
     return
   }
   
@@ -394,16 +394,16 @@ const saveUser = async () => {
       await fetchUsers()
       
       if (isEditMode.value) {
-        showToast(`✅ User "${userForm.name}" berhasil diupdate`, 'success', 3000)
+        showToast(`User "${userForm.name}" berhasil diupdate`, 'success', 3000)
       } else {
-        showToast(`✅ User "${userForm.name}" berhasil ditambahkan`, 'success', 3000)
+        showToast(`User "${userForm.name}" berhasil ditambahkan`, 'success', 3000)
       }
     } else {
-      showToast(`❌ Gagal menyimpan user: ${result.error}`, 'error', 4000)
+      showToast(`Gagal menyimpan user: ${result.error}`, 'error', 4000)
     }
   } catch (error) {
     console.error('Error saving user:', error)
-    showToast('❌ Terjadi kesalahan saat menyimpan user', 'error', 4000)
+    showToast('Terjadi kesalahan saat menyimpan user', 'error', 4000)
   } finally {
     loading.value = false
   }
@@ -412,7 +412,7 @@ const saveUser = async () => {
 const openDeleteModal = (user) => {
   if (!user || !user.id) {
     console.error('Invalid user data for delete:', user)
-    showToast('❌ Data user tidak valid', 'error', 3000)
+    showToast('Data user tidak valid', 'error', 3000)
     return
   }
   
@@ -427,19 +427,19 @@ const closeDeleteModal = () => {
 
 const confirmDelete = async () => {
   if (!selectedUser.value) {
-    showToast('❌ Tidak ada user yang dipilih', 'error', 3000)
+    showToast('Tidak ada user yang dipilih', 'error', 3000)
     return
   }
   
   if (!selectedUser.value.id) {
-    showToast('❌ ID user tidak valid', 'error', 3000)
+    showToast('ID user tidak valid', 'error', 3000)
     return
   }
   
   // Cek jangan sampai menghapus diri sendiri
   const currentUser = JSON.parse(localStorage.getItem('dashboard_user') || '{}')
   if (currentUser.id === selectedUser.value.id) {
-    showToast('⚠️ Anda tidak dapat menghapus akun sendiri!', 'warning', 4000)
+    showToast('Anda tidak dapat menghapus akun sendiri!', 'warning', 4000)
     closeDeleteModal()
     return
   }
@@ -459,7 +459,7 @@ const confirmDelete = async () => {
     closeDeleteModal()
   } catch (error) {
     console.error('Error deleting user:', error)
-    showToast(`❌ Gagal menghapus user: ${error.message}`, 'error', 4000)
+    showToast(`Gagal menghapus user: ${error.message}`, 'error', 4000)
   } finally {
     loading.value = false
   }
@@ -468,7 +468,7 @@ const confirmDelete = async () => {
 // Show warning if non-admin tries to access
 onMounted(() => {
   if (role.value !== 'admin') {
-    showToast('🔒 Halaman ini hanya dapat diakses oleh Admin!', 'error', 5000)
+    showToast('Halaman ini hanya dapat diakses oleh Admin!', 'error', 5000)
   } else {
     fetchUsers()
   }

@@ -17,7 +17,8 @@
         <p><strong>Jumlah saat ini:</strong> {{ props.transaksi?.jumlah }}</p>
         <p><strong>Stok saat ini:</strong> {{ props.transaksi?.barang?.stok }}</p>
         <p class="text-orange-600 mt-2">
-          ⚠️ Perubahan jumlah akan mempengaruhi stok barang!
+          <Icon name="mdi:alert" class="w-4 h-4 -mb-1" />
+          Perubahan jumlah akan mempengaruhi stok barang!
         </p>
       </div>
 
