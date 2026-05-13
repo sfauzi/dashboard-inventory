@@ -113,7 +113,7 @@
                   <button @click="openForm(barang)" class="text-blue-600 hover:text-blue-800" title="Edit barang">
                     <Icon name="mdi:pencil" class="w-5 h-5"/>
                   </button>
-                  <button @click="confirmDelete(barang)" class="text-red-600 hover:text-red-800" title="Hapus barang">
+                  <button @click="openDeleteModal(barang)" class="text-red-600 hover:text-red-800" title="Hapus barang">
                     <Icon name="mdi:delete" class="w-5 h-5"/>
                   </button>
                 </div>
@@ -194,6 +194,42 @@
       @close="closeForm"
       @save="handleSave"
     />
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
+            <Icon name="mdi:alert" class="w-6 h-6 text-red-600" />
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">Hapus Barang</h3>
+          <p class="text-gray-600 mb-4">
+            Apakah Anda yakin ingin menghapus barang <span class="font-semibold">{{ selectedBarang?.nama }}</span>?
+            <br />
+            <span class="text-sm text-red-500">Tindakan ini tidak dapat dibatalkan!</span>
+          </p>
+          <div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm">
+            <p><strong>Kode:</strong> {{ selectedBarang?.kode }}</p>
+            <p><strong>Stok:</strong> {{ selectedBarang?.stok }}</p>
+          </div>
+          <div class="flex gap-3">
+            <button
+              @click="confirmDelete"
+              :disabled="loading"
+              class="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+            >
+              {{ loading ? 'Menghapus...' : 'Ya, Hapus' }}
+            </button>
+            <button
+              @click="closeDeleteModal"
+              class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition"
+            >
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -210,11 +246,13 @@ const {
 } = useBarang();
 const { showToast } = useToast();
 const showFormModal = ref(false);
+const showDeleteModal = ref(false);
 const selectedBarang = ref(null);
 const searchQuery = ref("");
 const filterStock = ref("");
 const lastUpdateTime = ref(new Date().toLocaleTimeString());
 const refreshing = ref(false);
+const loading = ref(false);
 
 // Sorting
 const sortField = ref("nama");
@@ -308,7 +346,9 @@ const visiblePages = computed(() => {
 });
 
 // Reset page saat filter berubah
-watch([searchQuery, filterStock], () => { currentPage.value = 1; });
+watch([searchQuery, filterStock], () => {
+  currentPage.value = 1;
+});
 
 const openForm = (barang = null) => {
   selectedBarang.value = barang;
@@ -317,7 +357,9 @@ const openForm = (barang = null) => {
 
 const closeForm = () => {
   showFormModal.value = false;
-  selectedBarang.value = null;
+  if (!showDeleteModal.value) {
+    selectedBarang.value = null;
+  }
 };
 
 const handleSave = async (data) => {
@@ -344,16 +386,32 @@ const handleSave = async (data) => {
   }
 };
 
-const confirmDelete = async (barang) => {
-  if (confirm(`Hapus barang "${barang.nama}"?`)) {
-    const result = await deleteBarang(barang.id);
-    if (result.success) {
-      await refreshData();
-      showToast(`Barang "${barang.nama}" berhasil dihapus`, "warning", 3000);
-    } else {
-      showToast(`Gagal menghapus barang: ${result.error}`, "error", 4000);
-    }
+const openDeleteModal = (barang) => {
+  selectedBarang.value = barang;
+  showDeleteModal.value = true;
+};
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false;
+  selectedBarang.value = null;
+};
+
+const confirmDelete = async () => {
+  if (!selectedBarang.value) return;
+
+  loading.value = true;
+  const barangNama = selectedBarang.value.nama;
+  const barangId = selectedBarang.value.id;
+  const result = await deleteBarang(barangId);
+
+  if (result.success) {
+    closeDeleteModal();
+    await refreshData();
+    showToast(`Barang "${barangNama}" berhasil dihapus`, "warning", 3000);
+  } else {
+    showToast(`Gagal menghapus barang: ${result.error}`, "error", 4000);
   }
+  loading.value = false;
 };
 
 onMounted(() => {
