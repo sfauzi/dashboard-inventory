@@ -110,11 +110,11 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex gap-2">
-                  <button @click="openForm(barang)" class="text-blue-600 hover:text-blue-800">
-                    <Icon name="mdi:pencil" />
+                  <button @click="openForm(barang)" class="text-blue-600 hover:text-blue-800" title="Edit barang">
+                    <Icon name="mdi:pencil" class="w-5 h-5"/>
                   </button>
-                  <button @click="confirmDelete(barang)" class="text-red-600 hover:text-red-800">
-                    <Icon name="mdi:delete" />
+                  <button @click="confirmDelete(barang)" class="text-red-600 hover:text-red-800" title="Hapus barang">
+                    <Icon name="mdi:delete" class="w-5 h-5"/>
                   </button>
                 </div>
               </td>
