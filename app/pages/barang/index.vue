@@ -14,6 +14,24 @@
       </button>
     </div>
 
+    <!-- Real-time Status Indicator -->
+    <!-- <div class="mb-4 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        <span class="text-xs text-gray-500">Auto Refresh (3 detik)</span>
+      </div>
+      <div class="text-xs text-gray-400">Last update: {{ lastUpdateTime }}</div>
+      <div class="text-xs text-gray-400">Total data: {{ barangList.length }} barang</div>
+      <button
+        @click="manualRefresh"
+        :disabled="refreshing"
+        class="text-xs text-blue-600 hover:text-blue-800 transition"
+      >
+        <Icon :name="refreshing ? 'mdi:loading' : 'mdi:refresh'" class="inline mr-1" />
+        {{ refreshing ? "Refreshing..." : "Refresh Now" }}
+      </button>
+    </div> -->
+
     <!-- Search and Filter -->
     <div class="mb-6 flex gap-4">
       <div class="flex-1 relative">
@@ -136,6 +154,7 @@ const {
   deleteBarang,
   getLowStockBarang,
 } = useBarang();
+const { showToast } = useToast();
 const showFormModal = ref(false);
 const selectedBarang = ref(null);
 const searchQuery = ref("");
@@ -153,6 +172,12 @@ const refreshData = async () => {
 
 // Auto refresh setiap 3 detik
 useInterval(refreshData, 3000);
+
+// Manual refresh
+const manualRefresh = async () => {
+  await refreshData();
+  showToast("Data berhasil direfresh", "success", 2000);
+};
 
 const filteredBarang = computed(() => {
   let result = barangList.value;
@@ -185,7 +210,9 @@ const closeForm = () => {
 
 const handleSave = async (data) => {
   let result;
-  if (data.id) {
+  const isEdit = !!data.id;
+
+  if (isEdit) {
     result = await updateBarang(data.id, data);
   } else {
     const { id, ...newBarang } = data;
@@ -194,10 +221,15 @@ const handleSave = async (data) => {
 
   if (result.success) {
     closeForm();
-    alert(data.id ? "Barang berhasil diupdate" : "Barang berhasil ditambahkan");
-    await refreshData(); // Immediate refresh
+    await refreshData();
+
+    if (isEdit) {
+      showToast(`✅ Barang "${data.nama}" berhasil diupdate`, "success", 3000);
+    } else {
+      showToast(`✅ Barang "${data.nama}" berhasil ditambahkan`, "success", 3000);
+    }
   } else {
-    alert(result.error || "Gagal menyimpan barang");
+    showToast(`❌ Gagal menyimpan barang: ${result.error}`, "error", 4000);
   }
 };
 
@@ -206,8 +238,9 @@ const confirmDelete = async (barang) => {
     const result = await deleteBarang(barang.id);
     if (result.success) {
       await refreshData();
+      showToast(`🗑️ Barang "${barang.nama}" berhasil dihapus`, "warning", 3000);
     } else {
-      alert(result.error);
+      showToast(`❌ Gagal menghapus barang: ${result.error}`, "error", 4000);
     }
   }
 };
