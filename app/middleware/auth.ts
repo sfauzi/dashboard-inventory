@@ -8,10 +8,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     sessionStorage.setItem('pending_toast', JSON.stringify({ message, type, duration }))
   }
 
-  // Jika sedang proses logout, skip semua logic middleware
-  if (sessionStorage.getItem('is_logging_out')) {
+  // Flag logout hanya untuk suppress toast, bukan skip auth check
+  const isLoggingOut = !!sessionStorage.getItem('is_logging_out')
+  if (isLoggingOut) {
     sessionStorage.removeItem('is_logging_out')
-    return
   }
 
   try {
@@ -20,7 +20,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     if (!isAuth && !isPublicPage) {
       const appReady = sessionStorage.getItem('app_ready')
-      if (appReady) {
+      // Tampilkan toast hanya jika bukan logout DAN app sudah ready
+      if (appReady && !isLoggingOut) {
         setPendingToast(
           'Anda harus login terlebih dahulu untuk mengakses halaman ini',
           'warning',
@@ -37,11 +38,14 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     if (isAuth && to.path.startsWith('/users')) {
       if (userRole !== 'admin') {
-        setPendingToast(
-          'Akses ditolak! Halaman ini hanya untuk admin.',
-          'error',
-          4000
-        )
+        // Tampilkan toast hanya jika bukan proses logout
+        if (!isLoggingOut) {
+          setPendingToast(
+            'Akses ditolak! Halaman ini hanya untuk admin.',
+            'error',
+            4000
+          )
+        }
         return navigateTo('/dashboard')
       }
     }
