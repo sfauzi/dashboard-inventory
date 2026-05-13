@@ -128,11 +128,31 @@
 <script setup>
 definePageMeta({ middleware: "auth" });
 
-const { barangList, fetchBarang, createBarang, updateBarang, deleteBarang } = useBarang();
+const {
+  barangList,
+  fetchBarang,
+  createBarang,
+  updateBarang,
+  deleteBarang,
+  getLowStockBarang,
+} = useBarang();
 const showFormModal = ref(false);
 const selectedBarang = ref(null);
 const searchQuery = ref("");
 const filterStock = ref("");
+const lastUpdateTime = ref(new Date().toLocaleTimeString());
+const refreshing = ref(false);
+
+// Fungsi refresh data
+const refreshData = async () => {
+  refreshing.value = true;
+  await fetchBarang();
+  lastUpdateTime.value = new Date().toLocaleTimeString();
+  refreshing.value = false;
+};
+
+// Auto refresh setiap 3 detik
+useInterval(refreshData, 3000);
 
 const filteredBarang = computed(() => {
   let result = barangList.value;
@@ -165,12 +185,9 @@ const closeForm = () => {
 
 const handleSave = async (data) => {
   let result;
-
   if (data.id) {
-    // Update existing barang
     result = await updateBarang(data.id, data);
   } else {
-    // Create new barang - Hapus id jika ada
     const { id, ...newBarang } = data;
     result = await createBarang(newBarang);
   }
@@ -178,18 +195,24 @@ const handleSave = async (data) => {
   if (result.success) {
     closeForm();
     alert(data.id ? "Barang berhasil diupdate" : "Barang berhasil ditambahkan");
+    await refreshData(); // Immediate refresh
   } else {
     alert(result.error || "Gagal menyimpan barang");
   }
 };
 
-const confirmDelete = (barang) => {
+const confirmDelete = async (barang) => {
   if (confirm(`Hapus barang "${barang.nama}"?`)) {
-    deleteBarang(barang.id);
+    const result = await deleteBarang(barang.id);
+    if (result.success) {
+      await refreshData();
+    } else {
+      alert(result.error);
+    }
   }
 };
 
 onMounted(() => {
-  fetchBarang();
+  refreshData();
 });
 </script>

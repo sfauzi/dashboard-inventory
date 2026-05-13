@@ -18,8 +18,16 @@
 import Sidebar from "~/components/Layout/Sidebar.vue";
 
 const { isAuthenticated, checkUser } = useAuth();
+const { setupRealtime: setupBarangRealtime } = useBarang();
+const { setupRealtime } = useTransaksi();
 
 onMounted(async () => {
   await checkUser();
+
+  // Setup realtime untuk semua halaman
+  if (isAuthenticated.value) {
+    setupRealtime();
+    setupBarangRealtime();
+  }
 });
 </script>

@@ -4,6 +4,7 @@ export const useBarang = () => {
   const supabase = useSupabaseClient()
   const barangList = useState('barangList', () => [])
   const loading = useState('barangLoading', () => false)
+  const lastFetchTime = useState('lastFetchTimeBarang', () => Date.now())
 
   const fetchBarang = async () => {
     loading.value = true
@@ -23,11 +24,19 @@ export const useBarang = () => {
         throw error
       }
 
-      barangList.value = data || []
-      return data || []
+      // Check if data has changed
+      const newData = data || []
+      const hasChanged = JSON.stringify(barangList.value) !== JSON.stringify(newData)
+
+      if (hasChanged) {
+        barangList.value = newData
+        lastFetchTime.value = Date.now()
+        console.log('Barang data updated at:', new Date().toLocaleTimeString())
+      }
+
+      return newData
     } catch (error: any) {
       console.error('Error fetching barang:', error)
-      alert('Gagal mengambil data barang: ' + (error.message || 'Unknown error'))
       return []
     } finally {
       loading.value = false
@@ -40,7 +49,6 @@ export const useBarang = () => {
         throw new Error('Supabase client not available')
       }
 
-      // Generate UUID untuk id
       const generateUUID = () => {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
           const r = Math.random() * 16 | 0;
@@ -49,9 +57,8 @@ export const useBarang = () => {
         });
       }
 
-      // Data barang dengan id yang digenerate
       const newBarang = {
-        id: generateUUID(), // Generate ID manual
+        id: generateUUID(),
         nama: barang.nama,
         kode: barang.kode,
         stok: barang.stok || 0,
@@ -60,24 +67,19 @@ export const useBarang = () => {
         updated_at: new Date()
       }
 
-      console.log('Creating barang:', newBarang)
-
       const { data, error } = await supabase
         .from('barang')
         .insert([newBarang])
         .select()
         .single()
 
-      if (error) {
-        console.error('Create error:', error)
-        throw error
-      }
+      if (error) throw error
 
-      console.log('Barang created:', data)
+      // Immediate refresh after create
       await fetchBarang()
+
       return { success: true, data }
     } catch (error: any) {
-      console.error('Error creating barang:', error)
       return { success: false, error: error.message }
     }
   }
@@ -90,10 +92,7 @@ export const useBarang = () => {
 
       const { data, error } = await supabase
         .from('barang')
-        .update({
-          ...updates,
-          updated_at: new Date()
-        })
+        .update({ ...updates, updated_at: new Date() })
         .eq('id', id)
         .select()
         .single()
@@ -103,7 +102,6 @@ export const useBarang = () => {
       await fetchBarang()
       return { success: true, data }
     } catch (error: any) {
-      console.error('Error updating barang:', error)
       return { success: false, error: error.message }
     }
   }
@@ -124,7 +122,6 @@ export const useBarang = () => {
       await fetchBarang()
       return { success: true }
     } catch (error: any) {
-      console.error('Error deleting barang:', error)
       return { success: false, error: error.message }
     }
   }
@@ -136,6 +133,7 @@ export const useBarang = () => {
   return {
     barangList: readonly(barangList),
     loading: readonly(loading),
+    lastFetchTime: readonly(lastFetchTime),
     fetchBarang,
     createBarang,
     updateBarang,
