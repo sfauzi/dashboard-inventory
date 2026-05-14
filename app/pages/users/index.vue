@@ -511,13 +511,15 @@ const saveUser = async () => {
     }
     
     if (result.success) {
+      const userName = userForm.name // Simpan nama sebelum close modal
+      const isEdit = isEditMode.value // Simpan status edit
       closeFormModal()
       await fetchUsers()
       
-      if (isEditMode.value) {
-        showToast(`User "${userForm.name}" berhasil diupdate`, 'success', 3000)
+      if (isEdit) {
+        showToast(`User "${userName}" berhasil diupdate`, 'success', 3000)
       } else {
-        showToast(`User "${userForm.name}" berhasil ditambahkan`, 'success', 3000)
+        showToast(`User "${userName}" berhasil ditambahkan`, 'success', 3000)
       }
     } else {
       showToast(`Gagal menyimpan user: ${result.error}`, 'error', 4000)
