@@ -84,6 +84,8 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "save"]);
 
+const { showToast } = useToast();
+
 const form = reactive({
   jumlah: props.transaksi?.jumlah || 1,
   catatan: props.transaksi?.catatan || "",
@@ -125,7 +127,7 @@ const getJumlahPreview = () => {
 
 const save = () => {
   if (!isValid.value) {
-    alert("Jumlah harus lebih dari 0");
+    showToast('Jumlah harus lebih dari 0', 'warning', 3000);
     return;
   }
 
@@ -137,8 +139,10 @@ const save = () => {
     const currentStock = props.transaksi.barang?.stok || 0;
 
     if (selisih > 0 && currentStock - selisih < 0) {
-      alert(
-        `Stok tidak mencukupi! Stok saat ini: ${currentStock}, penambahan ${selisih} akan membuat stok negatif.`
+      showToast(
+        `Stok tidak mencukupi! Stok saat ini: ${currentStock}, penambahan ${selisih} akan membuat stok negatif.`,
+        'error',
+        4000
       );
       return;
     }
