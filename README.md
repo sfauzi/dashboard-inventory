@@ -354,4 +354,8 @@ Halaman login dengan validasi credential dan toast notification.
 3. Jalankan ulang query insert user
 ---
 
+**Current Version:** `v1.0.0` (Stable Release)  
+**Release Date:** 14 May 2026  
+**Status:** ✅ Production Ready
+
 **Dibuat dengan ❤️ menggunakan Nuxt.js 4 & Supabase**
