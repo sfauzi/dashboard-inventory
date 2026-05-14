@@ -576,7 +576,7 @@ const confirmDelete = async () => {
     if (error) throw error
     
     await fetchUsers()
-    showToast(`🗑️ User "${selectedUser.value.name}" berhasil dihapus`, 'warning', 3000)
+    showToast(`User "${selectedUser.value.name}" berhasil dihapus`, 'warning', 3000)
     closeDeleteModal()
   } catch (error) {
     console.error('Error deleting user:', error)
