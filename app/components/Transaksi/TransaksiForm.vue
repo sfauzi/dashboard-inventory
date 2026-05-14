@@ -11,7 +11,7 @@
           <select
             v-model="form.id_barang"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">Pilih Barang</option>
             <option
@@ -79,7 +79,7 @@
               form.tipe_transaksi === 'keluar' &&
               form.jumlah > (selectedBarang?.stok || 0)
             "
-            class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+            class="flex-1 bg-black text-white py-2 rounded-lg hover:bg-black/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Simpan
           </button>

@@ -14,7 +14,7 @@
             v-model="form.kode"
             type="text"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
             placeholder="Contoh: BRG-001"
           />
         </div>
@@ -27,7 +27,7 @@
             v-model="form.nama"
             type="text"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
             placeholder="Masukkan nama barang"
           />
         </div>
@@ -38,7 +38,7 @@
             v-model.number="form.stok"
             type="number"
             min="0"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
             placeholder="0"
           />
         </div>
@@ -49,14 +49,14 @@
             v-model="form.lokasi_rak"
             type="text"
             placeholder="Contoh: A-01"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
           />
         </div>
 
         <div class="flex gap-3 pt-4">
           <button
             type="submit"
-            class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            class="flex-1 bg-black text-white py-2 rounded-lg hover:bg-black/90 transition"
           >
             Simpan
           </button>

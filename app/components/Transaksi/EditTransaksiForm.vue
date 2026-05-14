@@ -53,7 +53,7 @@
           <button
             type="submit"
             :disabled="loading || !isValid"
-            class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+            class="flex-1 bg-black text-white py-2 rounded-lg hover:bg-black/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ loading ? "Menyimpan..." : "Update Transaksi" }}
           </button>

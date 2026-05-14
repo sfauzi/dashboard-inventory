@@ -7,7 +7,7 @@
       </div>
       <button
         @click="openFormModal"
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+        class="bg-black text-white px-4 py-2 rounded-lg hover:bg-black/90 transition flex items-center gap-2"
       >
         <Icon name="mdi:plus" />
         Tambah User
@@ -22,7 +22,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="Cari user..."
-          class="w-full md:w-96 pl-10 pr-3 py-2 border border-gray-300 rounded-lg"
+          class="w-full md:w-96 pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
         />
       </div>
     </div>
@@ -85,7 +85,7 @@
               <td class="px-6 py-4 text-sm text-gray-500">{{ formatDate(userItem.created_at) }}</td>
               <td class="px-6 py-4">
                 <div class="flex gap-2">
-                  <button @click="openEditModal(userItem)" class="text-blue-600 hover:text-blue-800 transition" title="Edit User">
+                  <button @click="openEditModal(userItem)" class="text-black hover:text-black/90 transition" title="Edit User">
                     <Icon name="mdi:pencil" class="w-5 h-5" />
                   </button>
                   <button @click="openDeleteModal(userItem)" class="text-red-600 hover:text-red-800 transition" title="Hapus User">
@@ -108,7 +108,7 @@
       <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between flex-wrap gap-3">
         <div class="flex items-center gap-2 text-sm text-gray-600">
           <span>Tampilkan</span>
-          <select v-model="pageSize" class="border border-gray-300 rounded px-2 py-1" @change="currentPage = 1">
+          <select v-model="pageSize" class="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-black" @change="currentPage = 1">
             <option :value="5">5</option>
             <option :value="10">10</option>
             <option :value="25">25</option>
@@ -126,7 +126,7 @@
           </button>
           <span v-for="page in visiblePages" :key="page">
             <button v-if="page !== '...'" @click="currentPage = page"
-              :class="currentPage === page ? 'bg-blue-600 text-white border-blue-600' : 'hover:bg-gray-50 border-gray-300'"
+              :class="currentPage === page ? 'bg-black text-white border-black/70' : 'hover:bg-gray-50 border-gray-300'"
               class="px-3 py-1 rounded border text-sm">
               {{ page }}
             </button>
@@ -165,7 +165,7 @@
               v-model="userForm.name"
               type="text"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
               placeholder="Masukkan nama lengkap"
             />
           </div>
@@ -180,7 +180,7 @@
               required
               :disabled="isEditMode"
               :class="isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
               placeholder="Masukkan username"
             />
             <p v-if="isEditMode" class="text-xs text-gray-500 mt-1">Username tidak dapat diubah</p>
@@ -196,7 +196,7 @@
                 v-model="userForm.password"
                 :type="showPassword ? 'text' : 'password'"
                 :required="!isEditMode"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black pr-10"
                 :placeholder="isEditMode ? 'Masukkan password baru (opsional)' : 'Masukkan password'"
               />
               <button
@@ -216,7 +216,7 @@
             <select
               v-model="userForm.role"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="operator">Operator</option>
               <option value="admin">Admin</option>
@@ -227,7 +227,7 @@
             <button 
               type="submit" 
               :disabled="loading"
-              class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex-1 bg-black text-white py-2 rounded-lg hover:bg-black/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span v-if="loading" class="flex items-center justify-center gap-2">
                 <Icon name="mdi:loading" class="animate-spin" />
