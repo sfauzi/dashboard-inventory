@@ -7,7 +7,7 @@
       </div>
       <button
         @click="openForm()"
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+        class="bg-black text-white px-4 py-2 rounded-lg hover:bg-black/90 transition flex items-center gap-2"
       >
         <Icon name="mdi:plus" />
         Tambah Barang
@@ -22,11 +22,11 @@
           v-model="searchQuery"
           type="text"
           placeholder="Cari barang..."
-          class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg"
+          class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
           @input="currentPage = 1"
         />
       </div>
-      <select v-model="filterStock" class="px-3 py-2 border border-gray-300 rounded-lg" @change="currentPage = 1">
+      <select v-model="filterStock" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black" @change="currentPage = 1">
         <option value="">Semua Stok</option>
         <option value="low">Stok Menipis (&lt;10)</option>
         <option value="normal">Stok Normal</option>
@@ -110,7 +110,7 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex gap-2">
-                  <button @click="openForm(barang)" class="text-blue-600 hover:text-blue-800" title="Edit barang">
+                  <button @click="openForm(barang)" class="text-black hover:text-black/90" title="Edit barang">
                     <Icon name="mdi:pencil" class="w-5 h-5"/>
                   </button>
                   <button @click="openDeleteModal(barang)" class="text-red-600 hover:text-red-800" title="Hapus barang">
@@ -162,7 +162,7 @@
             <button
               v-if="page !== '...'"
               @click="currentPage = page"
-              :class="currentPage === page ? 'bg-blue-600 text-white border-blue-600' : 'hover:bg-gray-50 border-gray-300'"
+              :class="currentPage === page ? 'bg-black text-white border-black/70' : 'hover:bg-gray-50 border-gray-300'"
               class="px-3 py-1 rounded border text-sm"
             >
               {{ page }}

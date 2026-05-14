@@ -7,7 +7,7 @@
       </div>
       <button
         @click="openCreateModal"
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+        class="bg-black text-white px-4 py-2 rounded-lg hover:bg-black/90 transition flex items-center gap-2"
       >
         <Icon name="mdi:plus" />
         Tambah Transaksi
@@ -16,7 +16,7 @@
 
     <!-- Filter -->
     <div class="mb-6 flex gap-4 flex-wrap">
-      <select v-model="filterTipe" class="px-3 py-2 border border-gray-300 rounded-lg" @change="currentPage = 1">
+      <select v-model="filterTipe" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black" @change="currentPage = 1">
         <option value="">Semua Transaksi</option>
         <option value="masuk">Barang Masuk</option>
         <option value="keluar">Barang Keluar</option>
@@ -24,7 +24,7 @@
 
       <select
         v-model="filterBarang"
-        class="px-3 py-2 border border-gray-300 rounded-lg flex-1 min-w-[200px]"
+        class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black flex-1 min-w-[200px]"
         @change="currentPage = 1"
       >
         <option value="">Semua Barang</option>
@@ -152,7 +152,7 @@
                 <div class="flex gap-2">
                   <button
                     @click="openEditModal(transaksi)"
-                    class="text-blue-600 hover:text-blue-800"
+                    class="text-black hover:text-black/90"
                     title="Edit Transaksi"
                   >
                     <Icon name="mdi:pencil" class="w-5 h-5" />
@@ -183,7 +183,7 @@
           <span>Tampilkan</span>
           <select
             v-model="pageSize"
-            class="border border-gray-300 rounded px-2 py-1"
+            class="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-black"
             @change="currentPage = 1"
           >
             <option :value="5">5</option>
@@ -214,7 +214,7 @@
               @click="currentPage = page"
               :class="
                 currentPage === page
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-black text-white border-black/70'
                   : 'hover:bg-gray-50 border-gray-300'
               "
               class="px-3 py-1 rounded border text-sm"

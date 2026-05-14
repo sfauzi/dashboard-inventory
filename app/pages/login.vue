@@ -5,9 +5,9 @@
     <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
       <div class="text-center mb-8">
         <div
-          class="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-4"
+          class="inline-flex items-center justify-center w-20 h-20 bg-black/10 rounded-full mb-4"
         >
-          <Icon name="mdi:package-variant" class="w-10 h-10 text-blue-600" />
+          <Icon name="mdi:package-variant" class="w-10 h-10 text-black" />
         </div>
         <h2 class="text-3xl font-bold text-gray-800">Dashboard Stok</h2>
         <p class="text-gray-600 mt-2">Sistem Manajemen Inventaris</p>
@@ -25,7 +25,7 @@
               v-model="form.username"
               type="text"
               required
-              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
               placeholder="Masukkan username"
             />
           </div>
@@ -42,7 +42,7 @@
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
               required
-              class="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
               placeholder="Masukkan password"
             />
             <button
@@ -61,7 +61,7 @@
         <button
           type="submit"
           :disabled="loading"
-          class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full bg-black text-white py-2 rounded-lg hover:bg-black/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span v-if="loading" class="flex items-center justify-center gap-2">
             <Icon name="mdi:loading" class="animate-spin" />
