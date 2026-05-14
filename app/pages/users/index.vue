@@ -511,13 +511,15 @@ const saveUser = async () => {
     }
     
     if (result.success) {
+      const userName = userForm.name // Simpan nama sebelum close modal
+      const isEdit = isEditMode.value // Simpan status edit
       closeFormModal()
       await fetchUsers()
       
-      if (isEditMode.value) {
-        showToast(`User "${userForm.name}" berhasil diupdate`, 'success', 3000)
+      if (isEdit) {
+        showToast(`User "${userName}" berhasil diupdate`, 'success', 3000)
       } else {
-        showToast(`User "${userForm.name}" berhasil ditambahkan`, 'success', 3000)
+        showToast(`User "${userName}" berhasil ditambahkan`, 'success', 3000)
       }
     } else {
       showToast(`Gagal menyimpan user: ${result.error}`, 'error', 4000)
@@ -576,11 +578,27 @@ const confirmDelete = async () => {
     if (error) throw error
     
     await fetchUsers()
-    showToast(`🗑️ User "${selectedUser.value.name}" berhasil dihapus`, 'warning', 3000)
+    showToast(`User "${selectedUser.value.name}" berhasil dihapus`, 'warning', 3000)
     closeDeleteModal()
   } catch (error) {
     console.error('Error deleting user:', error)
-    showToast(`Gagal menghapus user: ${error.message}`, 'error', 4000)
+    
+    // Handle foreign key constraint violation
+    if (error.message && error.message.includes('foreign key constraint')) {
+      showToast(
+        `User "${selectedUser.value.name}" tidak dapat dihapus karena masih memiliki transaksi. Silakan hapus atau pindahkan transaksi terlebih dahulu.`,
+        'error',
+        5000
+      )
+    } else if (error.message && error.message.includes('fkey')) {
+      showToast(
+        `User "${selectedUser.value.name}" tidak dapat dihapus karena terhubung dengan data lain sistem.`,
+        'error',
+        4000
+      )
+    } else {
+      showToast(`Gagal menghapus user: ${error.message}`, 'error', 4000)
+    }
   } finally {
     loading.value = false
   }
